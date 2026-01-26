@@ -787,7 +787,7 @@ async def txt_handler(bot: Client, m: Message):
                 # normalize cpvod -> media-cdn path used by API
                 url_norm = url.replace("https://cpvod.testbook.com/", "https://media-cdn.classplusapp.com/drm/")
                 api_url_call = f"https://covercel.vercel.app/extract_keys?url={url_norm}@bots_updatee&user_id={user_id}"
-"
+
                 keys_string = ""
                 mpd = None
                 try:

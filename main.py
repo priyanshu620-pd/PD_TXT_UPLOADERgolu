@@ -306,7 +306,7 @@ async def start(bot: Client, m: Message):
             await m.reply_text(
                 "**✨ Bot is active in this channel**\n\n"
                 "**Available Commands:**\n"
-                "• /drm - Download DRM videos\n"
+                "• /txt - Download DRM videos\n"
                 "• /plan - View channel subscription\n\n"
                 "Send these commands in the channel to use them."
             )
@@ -318,10 +318,10 @@ async def start(bot: Client, m: Message):
             if not is_authorized:
                 await m.reply_photo(
                     photo=photologo,
-                    caption="**Mʏ Nᴀᴍᴇ [DRM Wɪᴢᴀʀᴅ 🦋](https://t.me/ITsGOLU_OWNER_BOT)\n\nYᴏᴜ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴀᴄᴄᴇꜱꜱ ᴛᴏ ᴜꜱᴇ ᴛʜɪꜱ ʙᴏᴛ\nCᴏɴᴛᴀᴄᴛ [𝐈𝐓'𝐬𝐆𝐎𝐋𝐔.™®](https://t.me/ITsGOLU_OWNER_BOT) ғᴏʀ ᴀᴄᴄᴇꜱꜱ**",
+                    caption="**Mʏ Nᴀᴍᴇ [DRM Wɪᴢᴀʀᴅ 🦋](https://t.me/@Exter_pd62)\n\nYᴏᴜ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴀᴄᴄᴇꜱꜱ ᴛᴏ ᴜꜱᴇ ᴛʜɪꜱ ʙᴏᴛ\nCᴏɴᴛᴀᴄᴛ [𝐈𝐓'𝐬𝐆𝐎𝐋𝐔.™®](https://t.me/ITsGOLU_OWNER_BOT) ғᴏʀ ᴀᴄᴄᴇꜱꜱ**",
                     reply_markup=InlineKeyboardMarkup([
     [
-        InlineKeyboardButton("𝐈𝐓'𝐬𝐆𝐎𝐋𝐔.™®", url="https://t.me/ITsGOLU_OWNER_BOT")
+        InlineKeyboardButton("ONeX.™®", url="https://t.me/@Exter_pd62")
     ],
     [
         InlineKeyboardButton("ғᴇᴀᴛᴜʀᴇꜱ 🪔", callback_data="features"),
@@ -332,7 +332,7 @@ async def start(bot: Client, m: Message):
                 return
                 
             commands_list = (
-                "**>  /drm - ꜱᴛᴀʀᴛ ᴜᴘʟᴏᴀᴅɪɴɢ ᴄᴘ/ᴄᴡ ᴄᴏᴜʀꜱᴇꜱ**\n"
+                "**>  /txt - ꜱᴛᴀʀᴛ ᴜᴘʟᴏᴀᴅɪɴɢ ᴄᴘ/ᴄᴡ ᴄᴏᴜʀꜱᴇꜱ**\n"
                 "**>  /plan - ᴠɪᴇᴡ ʏᴏᴜʀ ꜱᴜʙꜱᴄʀɪᴘᴛɪᴏɴ ᴅᴇᴛᴀɪʟꜱ**\n"
             )
             
@@ -347,7 +347,7 @@ async def start(bot: Client, m: Message):
                 caption=f"**Mʏ ᴄᴏᴍᴍᴀɴᴅꜱ ғᴏʀ ʏᴏᴜ [{m.from_user.first_name} ](tg://settings)**\n\n{commands_list}",
                 reply_markup=InlineKeyboardMarkup([
     [
-        InlineKeyboardButton("𝐈𝐓'𝐬𝐆𝐎𝐋𝐔.™®", url="https://t.me/ITsGOLU_OWNER_BOT")
+        InlineKeyboardButton("ONeX", url="https://t.me/@Exter_pd62")
     ],
     [
         InlineKeyboardButton("ғᴇᴀᴛᴜʀᴇꜱ 🪔", callback_data="features"),
@@ -375,11 +375,11 @@ auth_filter = filters.create(auth_check_filter)
 @bot.on_message(~auth_filter & filters.private & filters.command)
 async def unauthorized_handler(client, message: Message):
     await message.reply(
-        "<b>Mʏ Nᴀᴍᴇ [DRM Wɪᴢᴀʀᴅ 🦋](https://t.me/ITsGOLU_OWNER_BOT)</b>\n\n"
+        "<b>Mʏ Nᴀᴍᴇ [DRM Wɪᴢᴀʀᴅ 🦋](https://t.me/@Exter_pd62)</b>\n\n"
         "<blockquote>You need to have an active subscription to use this bot.\n"
         "Please contact admin to get premium access.</blockquote>",
         reply_markup=InlineKeyboardMarkup([[
-            InlineKeyboardButton("💫 Get Premium Access", url="https://t.me/ITsGOLU_OWNER_BOT")
+            InlineKeyboardButton("💫 Get Premium Access", url="https://t.me/@Exter_pd62")
         ]])
     )
 
@@ -1086,7 +1086,7 @@ async def txt_handler(bot: Client, m: Message):
         f"├ 🖼️ ɪᴍᴀɢᴇꜱ : <code>{img_count}</code>\n"
         "╰────────────────────────────\n\n"
         
-        "<i>ᴇxᴛʀᴀᴄᴛᴇᴅ ʙʏ ᴡɪᴢᴀʀᴅ ʙᴏᴛꜱ 🤖</i>"
+        "<i>ᴇxᴛʀᴀᴄᴛᴇᴅ ʙʏ ONeX ʙᴏᴛꜱ 🤖</i>"
     )
 )
 
@@ -1165,9 +1165,9 @@ async def details_callback(client, callback_query: CallbackQuery):
     await callback_query.answer()
     details_text = (
         "**📋 Bot Details 📋**\n\n"
-        "• 🤖 Bot Name: DRM Wizard 🦋\n"
-        "• 👨‍💻 Developer: IT'sGOLU.™®\n"
-        "• 📱 Contact: @ITsGOLU_OWNER_BOT\n"
+        "• 🤖 Bot Name: DRM ONeX 🦋\n"
+        "• 👨‍💻 Developer: ONeX\n"
+        "• 📱 Contact: @Exter_pd62\n"
         "• 🔄 Version: 1.0\n"
         "• 📝 Language: Python\n"
         "• 🛠️ Framework: Pyrogram\n\n"
@@ -1192,7 +1192,7 @@ async def back_to_start_callback(client, callback_query: CallbackQuery):
     is_admin = db.is_admin(user_id)
     
     commands_list = (
-        "**>  /drm - ꜱᴛᴀʀᴛ ᴜᴘʟᴏᴀᴅɪɴɢ ᴄᴘ/ᴄᴡ ᴄᴏᴜʀꜱᴇꜱ**\n"
+        "**>  /txt - ꜱᴛᴀʀᴛ ᴜᴘʟᴏᴀᴅɪɴɢ ᴄᴘ/ᴄᴡ ᴄᴏᴜʀꜱᴇꜱ**\n"
         "**>  /plan - ᴠɪᴇᴡ ʏᴏᴜʀ ꜱᴜʙꜱᴄʀɪᴘᴛɪᴏɴ ᴅᴇᴛᴀɪʟꜱ**\n"
     )
     
@@ -1209,7 +1209,7 @@ async def back_to_start_callback(client, callback_query: CallbackQuery):
         ),
         reply_markup=InlineKeyboardMarkup([
             [
-                InlineKeyboardButton("𝐈𝐓'𝐬𝐆𝐎𝐋𝐔.™®", url="https://t.me/ITsGOLU_OWNER_BOT")
+                InlineKeyboardButton("ONeX", url="https://t.me/@Exter_pd62")
             ],
             [
                 InlineKeyboardButton("ғᴇᴀᴛᴜʀᴇꜱ 🪔", callback_data="features"),

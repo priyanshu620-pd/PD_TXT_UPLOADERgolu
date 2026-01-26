@@ -9,7 +9,7 @@ BOT_TOKEN = os.environ.get("BOT_TOKEN", "")
 CREDIT = os.environ.get("CREDIT", "ONeX")
 # MongoDB Configuration
 DATABASE_NAME = os.environ.get("DATABASE_NAME", "CpprivateApi")
-DATABASE_URL = os.environ.get("DATABASE_URL", "mongodb+srv://ONeX_db_user:<onexvartikuu142062>@cluster0.ga3zort.mongodb.net/?appName=Cluster0")  # Add your own atlas db
+DATABASE_URL = os.environ.get("DATABASE_URL", "mongodb+srv://megatronpd86:dQh1hbw4YjqadNq5@cluster0.aonwetb.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0)  # Add your own atlas db
 MONGO_URL = DATABASE_URL  # For auth system
 
 # Owner and Admin Configuration
@@ -59,6 +59,7 @@ Please contact the admin to get access.</blockquote>""",
 
 <blockquote>Use format: {format}</blockquote>"""
 }
+
 
 
 

@@ -1,5 +1,5 @@
 {
-  "name": "ugxdev",
+  "name": "ONeX",
   "description": "𝑻𝒆𝒙𝒕 𝑳𝒆𝒆𝒄𝒉 𝑽𝒊𝒅𝒆𝒐 𝑬𝒙𝒕𝒓𝒂𝒄𝒕𝒐𝒓 𝑭𝒐𝒓 𝑻𝒆𝒍𝒆𝒈𝒓𝒂𝒎",
   "logo": "https://files.catbox.moe/8e2qqw.jpg",
   "keywords": [
@@ -13,12 +13,12 @@
   "env": {
     "API_ID": {
       "description": "𝑬𝒏𝒕𝒆𝒓 𝒀𝒐𝒖𝒓 𝑨𝒑𝒊 𝑰𝑫",
-      "value": "22746239",
+      "value": "25105426",
       "required": true
     },
     "API_HASH": {
       "description": "𝑬𝒏𝒕𝒆𝒓 𝒀𝒐𝒖𝒓 𝑨𝒑𝒊 𝑯𝒂𝒔𝒉",
-      "value": "a98ec8cfd8572a3a7c936cf828fe6215",
+      "value": "d26c274c72a0cde1e7e157eec26f0226",
       "required": true
     },
     "BOT_TOKEN": {
@@ -28,12 +28,12 @@
     },
     "OWNER": {
       "description": "𝙀𝙣𝙩𝙚𝙧 𝙔𝙤𝙪𝙧 𝙏𝙚𝙡𝙚𝙜𝙧𝙖𝙢 𝙄𝘿",
-      "value": "7743201204",
+      "value": "6157862068",
       "required": true
     },
     "CREDIT": {
       "description": "𝙀𝙣𝙩𝙚𝙧 𝘾𝙧𝙚𝙙𝙞𝙩 𝙉𝙖𝙢𝙚 𝙞𝙣 𝙖𝙡𝙢𝙤𝙨𝙩 6-8 𝙡𝙚𝙩𝙩𝙚𝙧𝙨",
-      "value": "ITsGOLU",
+      "value": "ONeXBOT",
       "required": true
     }
   },

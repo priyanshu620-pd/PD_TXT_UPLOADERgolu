@@ -2,8 +2,8 @@ import os
 from os import environ
 
 # API Configuration
-API_ID = int(os.environ.get("API_ID", "25105426"))
-API_HASH = os.environ.get("API_HASH", "d26c274c72a0cde1e7e157eec26f0226")
+API_ID = int(os.environ.get("API_ID", "34320281"))
+API_HASH = os.environ.get("API_HASH", "e55840d9b1ba82ba7748a30e2bbbfc1a")
 BOT_TOKEN = os.environ.get("BOT_TOKEN", "")
 
 CREDIT = os.environ.get("CREDIT", "ONeX")
@@ -13,11 +13,11 @@ DATABASE_URL = os.environ.get("DATABASE_URL", "mongodb+srv://ONeX_db_user:onexva
 MONGO_URL = DATABASE_URL  # For auth system
 
 # Owner and Admin Configuration
-OWNER_ID = int(os.environ.get("OWNER_ID", "6157862068"))
-ADMINS = [int(x) for x in os.environ.get("ADMINS", "6157862068").split()]  # Default to owner ID
+OWNER_ID = int(os.environ.get("OWNER_ID", "8301160173"))
+ADMINS = [int(x) for x in os.environ.get("ADMINS", "8301160173").split()]  # Default to owner ID
 
 # Channel Configuration
-PREMIUM_CHANNEL = ""
+PREMIUM_CHANNEL = "https://t.me/+SSpHZhTOAsM5MTVl"
 # Thumbnail Configuration
 THUMBNAILS = list(map(str, os.environ.get("https://chatgpt.com/s/m_6977adbebab0819184f4da823b27700e", "").split())) # Image Link For Default Thumbnail 
 
@@ -59,6 +59,7 @@ Please contact the admin to get access.</blockquote>""",
 
 <blockquote>Use format: {format}</blockquote>"""
 }
+
 
 
 

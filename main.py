@@ -872,18 +872,18 @@ async def txt_handler(bot: Client, m: Message):
                 ytf = f"bestvideo[height<={raw_text2}]+bestaudio/best[height<={raw_text2}]"
             else:
                 ytf = f"b[height<={raw_text2}]/bv[height<={raw_text2}]+ba/b/bv+ba"
-           
+
             if "jw-prod" in url:
                 url = url.replace("https://apps-s3-jw-prod.utkarshapp.com/admin_v1/file_library/videos","https://d1q5ugnejk3zoi.cloudfront.net/ut-production-jw/admin_v1/file_library/videos")
                 cmd = f'yt-dlp -o "{name}.mp4" "{url}"'
             elif "webvideos.classplusapp." in url:
-               cmd = f'yt-dlp --add-header "referer:https://web.classplusapp.com/" --add-header "x-cdn-tag:empty" -f "{ytf}" "{url}" -o "{name}.mp4"'
+                cmd = f'yt-dlp --add-header "referer:https://web.classplusapp.com/" --add-header "x-cdn-tag:empty" -f "{ytf}" "{url}" -o "{name}.mp4"'
             elif "youtube.com" in url or "youtu.be" in url:
-                cmd = f'yt-dlp --cookies youtube_cookies.txt -f "{ytf}" "{url}" -o "{name}".mp4'
+                cmd = f'yt-dlp --cookies youtube_cookies.txt -f "{ytf}" "{url}" -o "{name}.mp4"'
             else:
                 cmd = f'yt-dlp -f "{ytf}" "{url}" -o "{name}.mp4"'
 
-           try:
+            try:
                 caption = (
                     f"Index: {str(count).zfill(3)}\n\n"
                     f"Title: {name1}.mp4\n\n"
@@ -892,7 +892,7 @@ async def txt_handler(bot: Client, m: Message):
                     f"Extracted By: {CR}"
                 )
                 cc = caption
-                
+
                 cc1 = (
                     f"Index: {str(count).zfill(3)}\n\n"
                     f"Title: {name1}.pdf\n\n"
@@ -900,34 +900,10 @@ async def txt_handler(bot: Client, m: Message):
                     f"Batch: {b_name}\n\n"
                     f"Extracted By: {CR}"
                 )
-                
+
                 cczip = (
                     f"Index: {str(count).zfill(3)}\n\n"
                     f"Title: {name1}.zip\n\n"
-                    f"Topic: {topic}\n\n"
-                    f"Batch: {b_name}\n\n"
-                    f"Extracted By: {CR}"
-                )
-                
-                ccimg = (
-                    f"Index: {str(count).zfill(3)}\n\n"
-                    f"Title: {name1}.jpg\n\n"
-                    f"Topic: {topic}\n\n"
-                    f"Batch: {b_name}\n\n"
-                    f"Extracted By: {CR}"
-                )
-                
-                ccm = (
-                    f"Index: {str(count).zfill(3)}\n\n"
-                    f"Title: {name1}.mp3\n\n"
-                    f"Topic: {topic}\n\n"
-                    f"Batch: {b_name}\n\n"
-                    f"Extracted By: {CR}"
-                )
-                
-                cchtml = (
-                    f"Index: {str(count).zfill(3)}\n\n"
-                    f"Title: {name1}.html\n\n"
                     f"Topic: {topic}\n\n"
                     f"Batch: {b_name}\n\n"
                     f"Extracted By: {CR}"

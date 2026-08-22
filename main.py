@@ -973,34 +973,54 @@ async def txt_handler(bot: Client, m: Message):
         await m.reply_text(str(e))
         await asyncio.sleep(2)
 
-    processed_range_count = end_idx - (start_idx - 1)
+   processed_range_count = end_idx - (start_idx - 1)
     success_count = processed_range_count - failed_count
     video_count = v2_count + mpd_count + m3u8_count + yt_count + drm_count + zip_count + other_count
-    
-    if str(raw_text7) == "/d":
-        await bot.send_message(
-            channel_id,
-            (
-                "<b>📬 ᴘʀᴏᴄᴇꜱꜱ ᴄᴏᴍᴘʟᴇᴛᴇᴅ</b>\n\n"
-                "<blockquote><b>📚 ʙᴀᴛᴄʜ ɴᴀᴍᴇ :</b> "
-                f"{b_name}</blockquote>\n"
-                "╭────────────────\n"
-                f"├ 🖇️ ᴛᴏᴛᴀʟ ᴜʀʟꜱ : <code>{processed_range_count}</code>\n"
-                f"├ ✅ ꜱᴜᴄᴄᴇꜱꜱꜰᴜʟ : <code>{success_count}</code>\n"
-                f"├ ❌ ꜰᴀɪʟᴇᴅ : <code>{failed_count}</code>\n"
-                "╰────────────────\n\n"
-                "╭──────── 📦 ᴄᴀᴛᴇɢᴏʀʏ ────────\n"
-                f"├ 🎞️ ᴠɪᴅᴇᴏꜱ : <code>{video_count}</code>\n"
-                f"├ 📑 ᴘᴅꜰꜱ : <code>{pdf_count}</code>\n"
-                f"├ 🖼️ ɪᴍᴀɢᴇꜱ : <code>{img_count}</code>\n"
-                "╰────────────────────────────\n\n"
-                "<i>ᴇxᴛʀᴀᴄᴛᴇᴅ ʙʏ ᴡɪᴢᴀʀᴅ ʙᴏᴛꜱ 🤖</i>"
-            )
-        )
-    else:
-        await bot.send_message(channel_id, f"<b>-┈━═.•°✅ Completed ✅°•.═━┈-</b>\n<blockquote><b>🎯Batch Name : {b_name}</b></blockquote>\n<blockquote>🔗 Total URLs: {processed_range_count} \n┃   ┠🔴 Total Failed URLs: {failed_count}\n┃   ┠🟢 Total Successful URLs: {success_count}\n┃   ┃   ┠🎥 Total Video URLs: {video_count}\n┃   ┃   ┠📄 Total PDF URLs: {pdf_count}\n┃   ┃   ┠📸 Total IMAGE URLs: {img_count}</blockquote>\n")
-        await bot.send_message(m.chat.id, "<blockquote><b>✅ Your Task is completed, please check your Set Channel📱</b></blockquote>")
 
+    default_msg = (
+        "<b>📬 ᴘʀᴏᴄᴇꜱꜱ ᴄᴏᴍᴘʟᴇᴛᴇᴅ</b>\n\n"
+        f"<blockquote><b>📚 ʙᴀᴛᴄʜ ɴᴀᴍᴇ :</b> {b_name}</blockquote>\n"
+        "╭────────────────\n"
+        f"├ 🖇️ ᴛᴏᴛᴀʟ ᴜʀʟꜱ : <code>{processed_range_count}</code>\n"
+        f"├ ✅ ꜱᴜᴄᴄᴇꜱꜱꜰᴜʟ : <code>{success_count}</code>\n"
+        f"├ ❌ ꜰᴀɪʟᴇᴅ : <code>{failed_count}</code>\n"
+        "╰────────────────\n\n"
+        "╭──────── 📦 ᴄᴀᴛᴇɢᴏʀʏ ────────\n"
+        f"├ 🎞️ ᴠɪᴅᴇᴏꜱ : <code>{video_count}</code>\n"
+        f"├ 📑 ᴘᴅꜰꜱ : <code>{pdf_count}</code>\n"
+        f"├ 🖼️ ɪᴍᴀɢᴇꜱ : <code>{img_count}</code>\n"
+        "╰────────────────────────────\n\n"
+        f"<i>ᴇxᴛʀᴀᴄᴛᴇᴅ ʙʏ {CR} 🤖</i>"
+    )
+
+    custom_msg = (
+        f"<b>-┈━═.•°✅ Completed ✅°•.═━┈-</b>\n"
+        f"<blockquote><b>🎯Batch Name : {b_name}</b></blockquote>\n"
+        f"<blockquote>🔗 Total URLs: {processed_range_count} \n"
+        f"┃   ┠🔴 Total Failed URLs: {failed_count}\n"
+        f"┃   ┠🟢 Total Successful URLs: {success_count}\n"
+        f"┃   ┃   ┠🎥 Total Video URLs: {video_count}\n"
+        f"┃   ┃   ┠📄 Total PDF URLs: {pdf_count}\n"
+        f"┃   ┃   ┠📸 Total IMAGE URLs: {img_count}</blockquote>\n"
+    )
+
+    try:
+        if str(raw_text7) == "/d":
+            await bot.send_message(channel_id, default_msg)
+        else:
+            await bot.send_message(channel_id, custom_msg)
+            await bot.send_message(
+                m.chat.id,
+                "<blockquote><b>✅ Your Task is completed, please check your Set Channel📱</b></blockquote>"
+            )
+    except Exception as e:
+        # Fallback to direct private chat if the channel ID is invalid or bot is not an admin
+        await m.reply_text(
+            f"⚠️ **Could not send completion message to target channel (`{channel_id}`):**\n"
+            f"<blockquote><i>{e}</i></blockquote>\n\n"
+            "Make sure the bot is added as an **Admin** in the target channel."
+        )
+        await m.reply_text(default_msg)
 
 # Single Direct URL Handler
 @bot.on_message(filters.text & filters.private)

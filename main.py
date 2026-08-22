@@ -855,52 +855,52 @@ async def txt_handler(bot: Client, m: Message):
 
             try:
                 caption = (
-                    f"Index: {str(count).zfill(3)}\n\n"
-                    f"Title: {name1}.mp4\n\n"
-                    f"Topic: {topic}\n\n"
-                    f"Batch: {b_name}\n\n"
-                    f"Extracted By: {CR}"
+                    f"𝗜𝗻𝗱𝗲𝘅: {str(count).zfill(3)}\n\n"
+                    f"𝗧𝗶𝘁𝗹𝗲: {name1}.mp4\n\n"
+                    f"𝗧𝗼𝗽𝗶𝗰: {topic}\n\n"
+                    f"𝗕𝗮𝘁𝗰𝗵: {b_name}\n\n"
+                    f"𝗘𝘅𝘁𝗿𝗮𝗰𝘁𝗲𝗱 𝗕𝘆: {CR}"
                 )
                 cc = caption
 
                 cc1 = (
-                    f"Index: {str(count).zfill(3)}\n\n"
-                    f"Title: {name1}.pdf\n\n"
-                    f"Topic: {topic}\n\n"
-                    f"Batch: {b_name}\n\n"
-                    f"Extracted By: {CR}"
+                    f"𝗜𝗻𝗱𝗲𝘅: {str(count).zfill(3)}\n\n"
+                    f"𝗧𝗶𝘁𝗹𝗲: {name1}.mp4\n\n"
+                    f"𝗧𝗼𝗽𝗶𝗰: {topic}\n\n"
+                    f"𝗕𝗮𝘁𝗰𝗵: {b_name}\n\n"
+                    f"𝗘𝘅𝘁𝗿𝗮𝗰𝘁𝗲𝗱 𝗕𝘆: {CR}"
                 )
 
                 cchtml = (
-                    f"Index: {str(count).zfill(3)}\n\n"
-                    f"Title: {name1}.html\n\n"
-                    f"Topic: {topic}\n\n"
-                    f"Batch: {b_name}\n\n"
-                    f"Extracted By: {CR}"
+                    f"𝗜𝗻𝗱𝗲𝘅: {str(count).zfill(3)}\n\n"
+                    f"𝗧𝗶𝘁𝗹𝗲: {name1}.mp4\n\n"
+                    f"𝗧𝗼𝗽𝗶𝗰: {topic}\n\n"
+                    f"𝗕𝗮𝘁𝗰𝗵: {b_name}\n\n"
+                    f"𝗘𝘅𝘁𝗿𝗮𝗰𝘁𝗲𝗱 𝗕𝘆: {CR}"
                 )
 
                 ccimg = (
-                    f"Index: {str(count).zfill(3)}\n\n"
-                    f"Title: {name1}\n\n"
-                    f"Topic: {topic}\n\n"
-                    f"Batch: {b_name}\n\n"
-                    f"Extracted By: {CR}"
+                    f"𝗜𝗻𝗱𝗲𝘅: {str(count).zfill(3)}\n\n"
+                    f"𝗧𝗶𝘁𝗹𝗲: {name1}.mp4\n\n"
+                    f"𝗧𝗼𝗽𝗶𝗰: {topic}\n\n"
+                    f"𝗕𝗮𝘁𝗰𝗵: {b_name}\n\n"
+                    f"𝗘𝘅𝘁𝗿𝗮𝗰𝘁𝗲𝗱 𝗕𝘆: {CR}"
                 )
 
                 ccm = (
-                    f"Index: {str(count).zfill(3)}\n\n"
-                    f"Title: {name1}\n\n"
-                    f"Topic: {topic}\n\n"
-                    f"Batch: {b_name}\n\n"
-                    f"Extracted By: {CR}"
+                    f"𝗜𝗻𝗱𝗲𝘅: {str(count).zfill(3)}\n\n"
+                    f"𝗧𝗶𝘁𝗹𝗲: {name1}.mp4\n\n"
+                    f"𝗧𝗼𝗽𝗶𝗰: {topic}\n\n"
+                    f"𝗕𝗮𝘁𝗰𝗵: {b_name}\n\n"
+                    f"𝗘𝘅𝘁𝗿𝗮𝗰𝘁𝗲𝗱 𝗕𝘆: {CR}"
                 )
 
                 cczip = (
-                    f"Index: {str(count).zfill(3)}\n\n"
-                    f"Title: {name1}.zip\n\n"
-                    f"Topic: {topic}\n\n"
-                    f"Batch: {b_name}\n\n"
-                    f"Extracted By: {CR}"
+                    f"𝗜𝗻𝗱𝗲𝘅: {str(count).zfill(3)}\n\n"
+                    f"𝗧𝗶𝘁𝗹𝗲: {name1}.mp4\n\n"
+                    f"𝗧𝗼𝗽𝗶𝗰: {topic}\n\n"
+                    f"𝗕𝗮𝘁𝗰𝗵: {b_name}\n\n"
+                    f"𝗘𝘅𝘁𝗿𝗮𝗰𝘁𝗲𝗱 𝗕𝘆: {CR}"
                 )
                   
                 if "drive" in url:

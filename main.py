@@ -1,4 +1,3 @@
-# 🔧 Standard Library
 import os
 import re
 import sys
@@ -78,12 +77,12 @@ auto_flags = {}
 auto_clicked = False
 
 # Global variables
-watermark = "/d"  # Default value
+watermark = "/d"
 count = 0
 userbot = None
-timeout_duration = 300  # 5 minutes
+timeout_duration = 300
 
-# Initialize bot with random session
+# Initialize bot
 bot = Client(
     "ugx",
     api_id=API_ID,
@@ -97,16 +96,51 @@ bot = Client(
 # Register command handlers
 register_clean_handler(bot)
 
+cookies_file_path = os.getenv("cookies_file_path", "youtube_cookies.txt")
+api_url = "http://master-api-v3.vercel.app/"
+api_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNzkxOTMzNDE5NSIsInRnX3VzZXJuYW1lIjoi4p61IFtvZmZsaW5lXSIsImlhdCI6MTczODY5MjA3N30.SXzZ1MZcvMp5sGESj0hBKSghhxJ3k1GTWoBUbivUe1I"
+cwtoken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE3NTExOTcwNjQsImNvbiI6eyJpc0FkbWluIjpmYWxzZSwiYXVzZXIiOiJVMFZ6TkdGU2NuQlZjR3h5TkZwV09FYzBURGxOZHowOSIsImlkIjoiVWtoeVRtWkhNbXRTV0RjeVJIcEJUVzExYUdkTlp6MDkiLCJmaXJzdF9uYW1lIjoiVWxadVFXaFBaMnAwSzJsclptVXpkbGxXT0djMlREWlRZVFZ5YzNwdldXNXhhVEpPWjFCWFYyd3pWVDA5IiwiZW1haWwiOiJWSGgyWjB0d2FUZFdUMVZYYmxoc2FsZFJSV2xrY0RWM2FGSkRSU3RzV0c5M1pDOW1hR0kxSzBOeVRUMDkiLCJwaG9uZSI6IldGcFZSSFZOVDJFeGNFdE9Oak4zUzJocmVrNHdRVDA5IiwiYXZhdGFyIjoiSzNWc2NTOHpTMHAwUW5sa2JrODNSRGx2ZWtOaVVUMDkiLCJyZWZlcnJhbF9jb2RlIjoiWkdzMlpUbFBORGw2Tm5OclMyVTRiRVIxTkVWb1FUMDkiLCJkZXZpY2VfdHlwZSI6ImFuZHJvaWQiLCJkZXZpY2VfdmVyc2lvbiI6IlEoQW5kcm9pZCAxMC4wKSIsImRldmljZV9tb2RlbCI6IlhpYW9taSBNMjAwN0oyMENJIiwicmVtb3RlX2FkZHIiOiI0NC4yMDIuMTkzLjIyMCJ9fQ.ONBsbnNwCQQtKMK2h18LCi73e90s2Cr63ZaIHtYueM-Gt5Z4sF6Ay-SEaKaIf1ir9ThflrtTdi5eFkUGIcI78R1stUUch_GfBXZsyg7aVyH2wxm9lKsFB2wK3qDgpd0NiBoT-ZsTrwzlbwvCFHhMp9rh83D4kZIPPdbp5yoA_06L0Zr4fNq3S328G8a8DtboJFkmxqG2T1yyVE2wLIoR3b8J3ckWTlT_VY2CCx8RjsstoTrkL8e9G5ZGa6sksMb93ugautin7GKz-nIz27pCr0h7g9BCoQWtL69mVC5xvVM3Z324vo5uVUPBi1bCG-ptpD9GWQ4exOBk9fJvGo-vRg"
+cptoken = ""
+photologo = 'https://i.ibb.co/v6Vr7HCt/1000003297.png'
+photoyt = 'https://i.ibb.co/v6Vr7HCt/1000003297.png'
+photocp = 'https://i.ibb.co/v6Vr7HCt/1000003297.png'
+photozip = 'https://i.ibb.co/v6Vr7HCt/1000003297.png'
+
+# Topic & Title Bracket Parser
+def parse_topic_and_title(raw_title: str, bracket_count: int = 2):
+    temp_title = raw_title.strip()
+    tags = []
+    while True:
+        match = re.match(r"^[\[\(]([^\]\)]+)[\]\)]\s*", temp_title)
+        if match:
+            tags.append(match.group(1).strip())
+            temp_title = temp_title[match.end():].strip()
+        else:
+            break
+
+    if tags:
+        selected_tags = tags[:bracket_count]
+        topic = " → ".join(selected_tags)
+        cleaned_title = temp_title
+    else:
+        topic = "General Topic"
+        cleaned_title = raw_title
+
+    cleaned_title = re.sub(r'[\\/*?:"<>|]', "", cleaned_title).strip()
+    if not cleaned_title:
+        cleaned_title = "Untitled"
+
+    return topic, cleaned_title
+
+
 @bot.on_message(filters.command("setlog") & filters.private)
 async def set_log_channel_cmd(client: Client, message: Message):
     """Set log channel for the bot"""
     try:
-        # Check if user is admin
         if not db.is_admin(message.from_user.id):
             await message.reply_text("⚠️ You are not authorized to use this command.")
             return
 
-        # Get command arguments
         args = message.text.split()
         if len(args) != 2:
             await message.reply_text(
@@ -122,7 +156,6 @@ async def set_log_channel_cmd(client: Client, message: Message):
             await message.reply_text("❌ Invalid channel ID. Please use a valid number.")
             return
 
-        # Set the log channel without validation
         if db.set_log_channel(client.me.username, channel_id):
             await message.reply_text(
                 "✅ Log channel set successfully!\n\n"
@@ -135,16 +168,15 @@ async def set_log_channel_cmd(client: Client, message: Message):
     except Exception as e:
         await message.reply_text(f"❌ Error: {str(e)}")
 
+
 @bot.on_message(filters.command("getlog") & filters.private)
 async def get_log_channel_cmd(client: Client, message: Message):
     """Get current log channel info"""
     try:
-        # Check if user is admin
         if not db.is_admin(message.from_user.id):
             await message.reply_text("⚠️ You are not authorized to use this command.")
             return
 
-        # Get log channel ID
         channel_id = db.get_log_channel(client.me.username)
         
         if channel_id:
@@ -172,45 +204,17 @@ async def get_log_channel_cmd(client: Client, message: Message):
     except Exception as e:
         await message.reply_text(f"❌ Error: {str(e)}")
 
+
 # Re-register auth commands
 bot.add_handler(MessageHandler(auth.add_user_cmd, filters.command("add") & filters.private))
 bot.add_handler(MessageHandler(auth.remove_user_cmd, filters.command("remove") & filters.private))
 bot.add_handler(MessageHandler(auth.list_users_cmd, filters.command("users") & filters.private))
 bot.add_handler(MessageHandler(auth.my_plan_cmd, filters.command("plan") & filters.private))
 
-cookies_file_path = os.getenv("cookies_file_path", "youtube_cookies.txt")
-api_url = "http://master-api-v3.vercel.app/"
-api_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNzkxOTMzNDE5NSIsInRnX3VzZXJuYW1lIjoi4p61IFtvZmZsaW5lXSIsImlhdCI6MTczODY5MjA3N30.SXzZ1MZcvMp5sGESj0hBKSghhxJ3k1GTWoBUbivUe1I"
-cwtoken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE3NTExOTcwNjQsImNvbiI6eyJpc0FkbWluIjpmYWxzZSwiYXVzZXIiOiJVMFZ6TkdGU2NuQlZjR3h5TkZwV09FYzBURGxOZHowOSIsImlkIjoiVWtoeVRtWkhNbXRTV0RjeVJIcEJUVzExYUdkTlp6MDkiLCJmaXJzdF9uYW1lIjoiVWxadVFXaFBaMnAwSzJsclptVXpkbGxXT0djMlREWlRZVFZ5YzNwdldXNXhhVEpPWjFCWFYyd3pWVDA5IiwiZW1haWwiOiJWSGgyWjB0d2FUZFdUMVZYYmxoc2FsZFJSV2xrY0RWM2FGSkRSU3RzV0c5M1pDOW1hR0kxSzBOeVRUMDkiLCJwaG9uZSI6IldGcFZSSFZOVDJFeGNFdE9Oak4zUzJocmVrNHdRVDA5IiwiYXZhdGFyIjoiSzNWc2NTOHpTMHAwUW5sa2JrODNSRGx2ZWtOaVVUMDkiLCJyZWZlcnJhbF9jb2RlIjoiWkdzMlpUbFBORGw2Tm5OclMyVTRiRVIxTkVWb1FUMDkiLCJkZXZpY2VfdHlwZSI6ImFuZHJvaWQiLCJkZXZpY2VfdmVyc2lvbiI6IlEoQW5kcm9pZCAxMC4wKSIsImRldmljZV9tb2RlbCI6IlhpYW9taSBNMjAwN0oyMENJIiwicmVtb3RlX2FkZHIiOiI0NC4yMDIuMTkzLjIyMCJ9fQ.ONBsbnNwCQQtKMK2h18LCi73e90s2Cr63ZaIHtYueM-Gt5Z4sF6Ay-SEaKaIf1ir9ThflrtTdi5eFkUGIcI78R1stUUch_GfBXZsyg7aVyH2wxm9lKsFB2wK3qDgpd0NiBoT-ZsTrwzlbwvCFHhMp9rh83D4kZIPPdbp5yoA_06L0Zr4fNq3S328G8a8DtboJFkmxqG2T1yyVE2wLIoR3b8J3ckWTlT_VY2CCx8RjsstoTrkL8e9G5ZGa6sksMb93ugautin7GKz-nIz27pCr0h7g9BCoQWtL69mVC5xvVM3Z324vo5uVUPBi1bCG-ptpD9GWQ4exOBk9fJvGo-vRg"
-cptoken = "" # Set fallback token for Classplus if applicable
-photologo = 'https://i.ibb.co/v6Vr7HCt/1000003297.png'
-photoyt = 'https://i.ibb.co/v6Vr7HCt/1000003297.png'
-photocp = 'https://i.ibb.co/v6Vr7HCt/1000003297.png'
-photozip = 'https://i.ibb.co/v6Vr7HCt/1000003297.png'
-
-# Inline keyboard for start command
-BUTTONSCONTACT = InlineKeyboardMarkup([[InlineKeyboardButton(text="📞 Contact", url="https://t.me/ITsGOLU_OWNER_BOT")]])
-keyboard = InlineKeyboardMarkup(
-    [
-        [
-            InlineKeyboardButton(text="🛠️ Help", url="https://t.me/ITsGOLU_OWNER_BOT")
-        ],
-    ]
-)
-
-# Image URLs for the random image feature
-image_urls = [
-    "https://i.ibb.co/v6Vr7HCt/1000003297.png",
-    "https://i.ibb.co/v6Vr7HCt/1000003297.png",
-    "https://i.ibb.co/v6Vr7HCt/1000003297.png",
-]
 
 @bot.on_message(filters.command("cookies") & filters.private)
 async def cookies_handler(client: Client, m: Message):
-    await m.reply_text(
-        "Please upload the cookies file (.txt format).",
-        quote=True
-    )
+    await m.reply_text("Please upload the cookies file (.txt format).", quote=True)
 
     try:
         input_message: Message = await client.listen(m.chat.id)
@@ -234,9 +238,9 @@ async def cookies_handler(client: Client, m: Message):
     except Exception as e:
         await m.reply_text(f"⚠️ An error occurred: {str(e)}")
 
+
 @bot.on_message(filters.command(["t2t"]))
 async def text_to_txt(client, message: Message):
-    user_id = str(message.from_user.id)
     editable = await message.reply_text("<blockquote>Welcome to the Text to .txt Converter!\nSend the **text** for convert into a `.txt` file.</blockquote>")
     input_message: Message = await bot.listen(message.chat.id)
     if not input_message.text:
@@ -259,15 +263,13 @@ async def text_to_txt(client, message: Message):
 
     txt_file = os.path.join("downloads", f'{custom_file_name}.txt')
     os.makedirs(os.path.dirname(txt_file), exist_ok=True)
-    with open(txt_file, 'w') as f:
+    with open(txt_file, 'w', encoding='utf-8') as f:
         f.write(text_data)
         
     await message.reply_document(document=txt_file, caption=f"`{custom_file_name}.txt`\n\n<blockquote>You can now download your content! 📥</blockquote>")
     if os.path.exists(txt_file):
         os.remove(txt_file)
 
-UPLOAD_FOLDER = '/path/to/upload/folder'
-EDITED_FILE_PATH = '/path/to/save/edited_output.txt'
 
 @bot.on_message(filters.command("getcookies") & filters.private)
 async def getcookies_handler(client: Client, m: Message):
@@ -280,10 +282,24 @@ async def getcookies_handler(client: Client, m: Message):
     except Exception as e:
         await m.reply_text(f"⚠️ An error occurred: {str(e)}")
 
+
 @bot.on_message(filters.command(["stop"]))
 async def restart_handler(_, m):
     await m.reply_text("🚦**STOPPED**", True)
     os.execl(sys.executable, sys.executable, *sys.argv)
+
+
+def auth_check_filter(_, client, message):
+    try:
+        if message.chat.type == "channel":
+            return db.is_channel_authorized(message.chat.id, client.me.username)
+        else:
+            return db.is_user_authorized(message.from_user.id, client.me.username)
+    except Exception:
+        return False
+
+auth_filter = filters.create(auth_check_filter)
+
 
 @bot.on_message(filters.command("start") & (filters.private | filters.channel))
 async def start(bot: Client, m: Message):
@@ -308,9 +324,7 @@ async def start(bot: Client, m: Message):
                     photo=photologo,
                     caption="**Mʏ Nᴀᴍᴇ [DRM Wɪᴢᴀʀᴅ 🦋](https://t.me/ITsGOLU_OWNER_BOT)\n\nYᴏᴜ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴀᴄᴄᴇꜱꜱ ᴛᴏ ᴜꜱᴇ ᴛʜɪꜱ ʙᴏᴛ\nCᴏɴᴛᴀᴄᴛ [𝐈𝐓'𝐬𝐆𝐎𝐋𝐔.™®](https://t.me/ITsGOLU_OWNER_BOT) ғᴏʀ ᴀᴄᴄᴇꜱꜱ**",
                     reply_markup=InlineKeyboardMarkup([
-                        [
-                            InlineKeyboardButton("𝐈𝐓'𝐬𝐆𝐎𝐋𝐔.™®", url="https://t.me/ITsGOLU_OWNER_BOT")
-                        ],
+                        [InlineKeyboardButton("𝐈𝐓'𝐬𝐆𝐎𝐋𝐔.™®", url="https://t.me/ITsGOLU_OWNER_BOT")],
                         [
                             InlineKeyboardButton("ғᴇᴀᴛᴜʀᴇꜱ 🪔", callback_data="features"),
                             InlineKeyboardButton("ᴅᴇᴛᴀɪʟꜱ 🦋", callback_data="details")
@@ -334,9 +348,7 @@ async def start(bot: Client, m: Message):
                 photo=photologo,
                 caption=f"**Mʏ ᴄᴏᴍᴍᴀɴᴅꜱ ғᴏʀ ʏᴏᴜ [{m.from_user.first_name} ](tg://settings)**\n\n{commands_list}",
                 reply_markup=InlineKeyboardMarkup([
-                    [
-                        InlineKeyboardButton("𝐈𝐓'𝐬𝐆𝐎𝐋𝐔.™®", url="https://t.me/ITsGOLU_OWNER_BOT")
-                    ],
+                    [InlineKeyboardButton("𝐈𝐓'𝐬𝐆𝐎𝐋𝐔.™®", url="https://t.me/ITsGOLU_OWNER_BOT")],
                     [
                         InlineKeyboardButton("ғᴇᴀᴛᴜʀᴇꜱ 🪔", callback_data="features"),
                         InlineKeyboardButton("ᴅᴇᴛᴀɪʟꜱ 🦋", callback_data="details")
@@ -347,16 +359,6 @@ async def start(bot: Client, m: Message):
     except Exception as e:
         print(f"Error in start command: {str(e)}")
 
-def auth_check_filter(_, client, message):
-    try:
-        if message.chat.type == "channel":
-            return db.is_channel_authorized(message.chat.id, client.me.username)
-        else:
-            return db.is_user_authorized(message.from_user.id, client.me.username)
-    except Exception:
-        return False
-
-auth_filter = filters.create(auth_check_filter)
 
 @bot.on_message(~auth_filter & filters.private & filters.command)
 async def unauthorized_handler(client, message: Message):
@@ -369,6 +371,7 @@ async def unauthorized_handler(client, message: Message):
         ]])
     )
 
+
 @bot.on_message(filters.command(["id"]))
 async def id_command(client, message: Message):
     chat_id = message.chat.id
@@ -376,9 +379,11 @@ async def id_command(client, message: Message):
         f"<blockquote>The ID of this chat id is:</blockquote>\n`{chat_id}`"
     )
 
+
 @bot.on_message(filters.command(["t2h"]))
 async def call_html_handler(bot: Client, message: Message):
     await html_handler(bot, message)
+
 
 @bot.on_message(filters.command(["logs"]) & auth_filter)
 async def send_logs(client: Client, m: Message):
@@ -401,6 +406,8 @@ async def send_logs(client: Client, m: Message):
     except Exception as e:
         await m.reply_text(f"**Error sending logs:**\n<blockquote>{e}</blockquote>")
 
+
+# Main DRM Processor
 @bot.on_message(filters.command(["drm"]) & auth_filter)
 async def txt_handler(bot: Client, m: Message):  
     bot_info = await bot.get_me()
@@ -416,10 +423,14 @@ async def txt_handler(bot: Client, m: Message):
     
     editable = await m.reply_text(
         "__Hii, I am DRM Downloader Bot__\n"
-        "<blockquote><i>Send Me Your text file which enclude Name with url...\nE.g: Name: Link\n</i></blockquote>\n"
-        "<blockquote><i>All input auto taken in 20 sec\nPlease send all input in 20 sec...\n</i></blockquote>"
+        "<blockquote><i>Send Me Your text file which includes Name with url...\nE.g: Name: Link\n</i></blockquote>"
     )
-    input_doc: Message = await bot.listen(editable.chat.id)
+    
+    try:
+        input_doc: Message = await bot.listen(editable.chat.id, timeout=60)
+    except asyncio.TimeoutError:
+        await editable.edit("⚠️ **Session Timed Out! Run /drm again.**")
+        return
     
     if not input_doc.document:
         await m.reply_text("<b>❌ Please send a text file!</b>")
@@ -444,46 +455,46 @@ async def txt_handler(bot: Client, m: Message):
     drm_count = 0
     zip_count = 0
     other_count = 0
-
-    try:
-        with open(x, "r", encoding="utf-8") as f:
+    
+    try:    
+        with open(x, "r", encoding='utf-8') as f:
             content = f.read()
-
+            
         content = [line.strip() for line in content.split("\n") if line.strip()]
         links = []
         for i in content:
             if "://" in i:
                 parts = i.split("://", 1)
                 if len(parts) == 2:
-                    name = parts[0]
-                    url = parts[1]
-                    links.append([name, url])
-
-                if ".pdf" in url:
+                    name_part = parts[0]
+                    url_part = parts[1]
+                    links.append([name_part, url_part])
+                    
+                if ".pdf" in url_part:
                     pdf_count += 1
-                elif url.endswith((".png", ".jpeg", ".jpg")):
+                elif url_part.endswith((".png", ".jpeg", ".jpg")):
                     img_count += 1
-                elif "v2" in url:
+                elif "v2" in url_part:
                     v2_count += 1
-                elif "mpd" in url:
+                elif "mpd" in url_part:
                     mpd_count += 1
-                elif "m3u8" in url:
+                elif "m3u8" in url_part:
                     m3u8_count += 1
-                elif "drm" in url:
+                elif "drm" in url_part:
                     drm_count += 1
-                elif "youtu" in url:
+                elif "youtu" in url_part:
                     yt_count += 1
-                elif "zip" in url:
+                elif "zip" in url_part:
                     zip_count += 1
                 else:
                     other_count += 1
-
+                    
         if not links:
             await editable.edit("❌ **No links found in the text file!**")
             if os.path.exists(x):
                 os.remove(x)
             return
-
+            
     except UnicodeDecodeError:
         await m.reply_text("<b>❌ File encoding error! Please make sure the file is saved with UTF-8 encoding.</b>")
         if os.path.exists(x):
@@ -495,7 +506,7 @@ async def txt_handler(bot: Client, m: Message):
             os.remove(x)
         return
 
-    # Define total_links directly after parsing
+    # Define total_links safely after parsing
     total_links = len(links)
 
     # 1️⃣ Single Configuration Prompt
@@ -509,6 +520,7 @@ async def txt_handler(bot: Client, m: Message):
     )
 
     await editable.edit(prompt_text)
+
     try:
         input_cfg: Message = await bot.listen(editable.chat.id, timeout=60)
         raw_config = input_cfg.text.strip()
@@ -517,6 +529,7 @@ async def txt_handler(bot: Client, m: Message):
         raw_config = "1\n0\n0\n0"
 
     config_lines = [line.strip() for line in raw_config.split("\n") if line.strip()]
+
     # Parse 1️⃣ Index (supports single "5" or range "5-10")
     start_idx = 1
     end_idx = total_links
@@ -973,7 +986,7 @@ async def txt_handler(bot: Client, m: Message):
         await m.reply_text(str(e))
         await asyncio.sleep(2)
 
-   processed_range_count = end_idx - (start_idx - 1)
+    processed_range_count = end_idx - (start_idx - 1)
     success_count = processed_range_count - failed_count
     video_count = v2_count + mpd_count + m3u8_count + yt_count + drm_count + zip_count + other_count
 
@@ -1014,13 +1027,13 @@ async def txt_handler(bot: Client, m: Message):
                 "<blockquote><b>✅ Your Task is completed, please check your Set Channel📱</b></blockquote>"
             )
     except Exception as e:
-        # Fallback to direct private chat if the channel ID is invalid or bot is not an admin
         await m.reply_text(
             f"⚠️ **Could not send completion message to target channel (`{channel_id}`):**\n"
             f"<blockquote><i>{e}</i></blockquote>\n\n"
             "Make sure the bot is added as an **Admin** in the target channel."
         )
         await m.reply_text(default_msg)
+
 
 # Single Direct URL Handler
 @bot.on_message(filters.text & filters.private)

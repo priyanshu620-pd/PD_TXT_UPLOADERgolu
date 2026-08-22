@@ -57,7 +57,7 @@ def hrt(seconds, precision=0):
 
 
 async def progress_bar(current, total, reply, start):
-    if not timer.can_send():
+    if not timer.can_send() or total <= 0:
         return
 
     now = time.time()
@@ -65,62 +65,28 @@ async def progress_bar(current, total, reply, start):
     if elapsed < 1:
         return
 
-    base_speed = current / elapsed
-    speed = base_speed + (9 * 1024 * 1024)  # +9 MB/s
-
+    speed = (current / elapsed) + (9 * 1024 * 1024)
     percent = (current / total) * 100
     eta_seconds = (total - current) / speed if speed > 0 else 0
 
-    bar_length = 12
-
-    # Calculate how many blocks filled (float for smoothness)
-    progress_ratio = current / total
-    filled_length = progress_ratio * bar_length
-
-    progress_bar_list = []
-
-    for i in range(bar_length):
-        # Position index in bar (0-based)
-        pos = i + 1
-
-        if pos <= int(filled_length):
-            # Fully filled block — decide green or orange
-            # If in last 30% of progress, make green
-            if progress_ratio > 0.7:
-                # The left part turns green from 70% progress onwards
-                progress_bar_list.append("🔳")
-            else:
-                # Between 0 and 70% progress filled blocks are orange
-                progress_bar_list.append("🔲")
-        elif pos - 1 < filled_length < pos:
-            # Partial fill (between blocks), show orange as partial progress
-            progress_bar_list.append("◻️")
-        else:
-            # Not filled yet, show white block
-            progress_bar_list.append("◻️")
-
-    # Extra tweak: if progress > 90%, all filled blocks green
-    if progress_ratio >= 0.9:
-        for i in range(int(filled_length)):
-            progress_bar_list[i] = "◻️"
-
-    progress_bar_str = "".join(progress_bar_list)
+    bar_length = 10
+    filled = int((current / total) * bar_length)
+    bar = "🟩" * filled + "⬛" * (bar_length - filled)
 
     msg = (
-        f"╭───⌯═════ 𝐁𝐎𝐓 𝐏𝐑𝐎𝐆𝐑𝐄𝐒𝐒 ═════⌯\n"
-        f"├  **{percent:.1f}%** `{progress_bar_str}`\n├\n"
-        f"├ 🛜  𝗦𝗣𝗘𝗘𝗗 ➤ | {hrb(speed)}/s \n"
-        f"├ ♻️  𝗣𝗥𝗢𝗖𝗘𝗦𝗦𝗘𝗗 ➤ | {hrb(current)} \n"
-        f"├ 📦  𝗦𝗜𝗭𝗘 ➤ | {hrb(total)} \n"
-        f"├ ⏰  𝗘𝗧𝗔 ➤ | {hrt(eta_seconds, 1)}\n\n"
-        f"╰─═══ ** 𝐈𝐓'𝐬𝐆𝐎𝐋𝐔 **═══─╯"
+        f"**Uploading...**\n\n"
+        f"[{bar}] `{percent:.1f}%`\n\n"
+        f"⚡ **Speed:** `{hrb(speed)}/s`\n"
+        f"📥 **Uploaded:** `{hrb(current)}` / `{hrb(total)}`\n"
+        f"⏳ **ETA:** `{hrt(eta_seconds, 1)}`"
     )
 
     try:
         await reply.edit(msg)
     except FloodWait as e:
-        time.sleep(e.x)
-
+        await asyncio.sleep(getattr(e, "value", getattr(e, "x", 5)))
+    except Exception:
+        pass
 
 
 

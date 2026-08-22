@@ -444,11 +444,11 @@ async def txt_handler(bot: Client, m: Message):
     drm_count = 0
     zip_count = 0
     other_count = 0
-    
-     try:    
-        with open(x, "r", encoding='utf-8') as f:
+
+    try:
+        with open(x, "r", encoding="utf-8") as f:
             content = f.read()
-            
+
         content = [line.strip() for line in content.split("\n") if line.strip()]
         links = []
         for i in content:
@@ -458,7 +458,7 @@ async def txt_handler(bot: Client, m: Message):
                     name = parts[0]
                     url = parts[1]
                     links.append([name, url])
-                    
+
                 if ".pdf" in url:
                     pdf_count += 1
                 elif url.endswith((".png", ".jpeg", ".jpg")):
@@ -477,13 +477,13 @@ async def txt_handler(bot: Client, m: Message):
                     zip_count += 1
                 else:
                     other_count += 1
-                    
+
         if not links:
             await editable.edit("❌ **No links found in the text file!**")
             if os.path.exists(x):
                 os.remove(x)
             return
-            
+
     except UnicodeDecodeError:
         await m.reply_text("<b>❌ File encoding error! Please make sure the file is saved with UTF-8 encoding.</b>")
         if os.path.exists(x):
@@ -517,7 +517,6 @@ async def txt_handler(bot: Client, m: Message):
         raw_config = "1\n0\n0\n0"
 
     config_lines = [line.strip() for line in raw_config.split("\n") if line.strip()]
-
     # Parse 1️⃣ Index (supports single "5" or range "5-10")
     start_idx = 1
     end_idx = total_links

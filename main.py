@@ -497,163 +497,87 @@ async def txt_handler(bot: Client, m: Message):
             os.remove(x)
         return
     
-    await editable.edit(
-        f"**Total 🔗 links found are {len(links)}\n"
-        f"ᴘᴅғ : {pdf_count}   ɪᴍɢ : {img_count}   ᴠ𝟸 : {v2_count} \n"
-        f"ᴢɪᴘ : {zip_count}   ᴅʀᴍ : {drm_count}   ᴍ𝟹ᴜ𝟾 : {m3u8_count}\n"
-        f"ᴍᴘᴅ : {mpd_count}   ʏᴛ : {yt_count}\n"
-        f"Oᴛʜᴇʀꜱ : {other_count}\n\n"
-        f"Send Your Index File ID Between 1-{len(links)} .**"
+# 1️⃣ Single Configuration Prompt
+    prompt_text = (
+        f"🔗 **Total URLs:** `{total_links}`\n\n"
+        f"📌 **Enter config (each on new line):**\n"
+        f"1️⃣ Start index (e.g., `5` or `5-10`)\n"
+        f"2️⃣ Batch name (`0` for default)\n"
+        f"3️⃣ Credit (`0` for default)\n"
+        f"4️⃣ Bracket count (`0` for default 2)"
     )
-    
-    chat_id = editable.chat.id
-    current_timeout = 3 if auto_flags.get(chat_id) else 20
-    try:
-        input0: Message = await bot.listen(editable.chat.id, timeout=current_timeout)
-        raw_text = input0.text
-        await input0.delete(True)
-    except asyncio.TimeoutError:
-        raw_text = '1'
-    
-    try:
-        if int(raw_text) > len(links):
-            await editable.edit(f"**🔹Enter number in range of Index (01-{len(links)})**")
-            await m.reply_text("**🔹Exiting Task......**")
-            return
-    except ValueError:
-        raw_text = '1'
-    
-    current_timeout = 3 if auto_flags.get(chat_id) else 20
-    await editable.edit("**1. Enter Batch Name\n2. Send /d For TXT Batch Name**")
-    try:
-        input1: Message = await bot.listen(editable.chat.id, timeout=current_timeout)
-        raw_text0 = input1.text
-        await input1.delete(True)
-    except asyncio.TimeoutError:
-        raw_text0 = '/d'
-    
-    if raw_text0 == '/d':
-        b_name = file_name.replace('_', ' ')
-    else:
-        b_name = raw_text0
-    
-    current_timeout = 3 if auto_flags.get(chat_id) else 20
-    await editable.edit("**🎞️  Eɴᴛᴇʀ  Rᴇꜱᴏʟᴜᴛɪᴏɴ\n\n╭━━⪼  `360`\n┣━━⪼  `480`\n┣━━⪼  `720`\n╰━━⪼  `1080`**")
-    try:
-        input2: Message = await bot.listen(editable.chat.id, timeout=current_timeout)
-        raw_text2 = input2.text
-        await input2.delete(True)
-    except asyncio.TimeoutError:
-        raw_text2 = '480'
-        
-    quality = f"{raw_text2}p"
-    try:
-        if raw_text2 == "144":
-            res = "256x144"
-        elif raw_text2 == "240":
-            res = "426x240"
-        elif raw_text2 == "360":
-            res = "640x360"
-        elif raw_text2 == "480":
-            res = "854x480"
-        elif raw_text2 == "720":
-            res = "1280x720"
-        elif raw_text2 == "1080":
-            res = "1920x1080" 
-        else: 
-            res = "UN"
-    except Exception:
-        res = "UN"
 
-    current_timeout = 3 if auto_flags.get(chat_id) else 20
-    await editable.edit("**1. Send A Text For Watermark\n2. Send /d for no watermark & fast dwnld**")
+    await editable.edit(prompt_text)
+
     try:
-        inputx: Message = await bot.listen(editable.chat.id, timeout=current_timeout)
-        raw_textx = inputx.text
-        await inputx.delete(True)
+        input_cfg: Message = await bot.listen(editable.chat.id, timeout=60)
+        raw_config = input_cfg.text.strip()
+        await input_cfg.delete(True)
     except asyncio.TimeoutError:
-        raw_textx = '/d'
-    
-    global watermark
-    if raw_textx == '/d':
-        watermark = "/d"
+        raw_config = "1\n0\n0\n0"
+
+    config_lines = [line.strip() for line in raw_config.split("\n") if line.strip()]
+
+    # Parse 1️⃣ Index (supports single "5" or range "5-10")
+    start_idx = 1
+    end_idx = total_links
+    if len(config_lines) >= 1:
+        idx_val = config_lines[0]
+        if "-" in idx_val:
+            parts = idx_val.split("-", 1)
+            try:
+                start_idx = max(1, int(parts[0]))
+                end_idx = min(total_links, int(parts[1]))
+            except ValueError:
+                start_idx, end_idx = 1, total_links
+        else:
+            try:
+                start_idx = max(1, int(idx_val))
+                end_idx = total_links
+            except ValueError:
+                start_idx = 1
+
+    # Parse 2️⃣ Batch Name
+    if len(config_lines) >= 2 and config_lines[1] != "0":
+        b_name = config_lines[1]
     else:
-        watermark = raw_textx
-    
-    current_timeout = 3 if auto_flags.get(chat_id) else 20
-    await editable.edit("**1. Send Your Name For Caption Credit\n2. Send /d For default Credit**")
-    try:
-        input3: Message = await bot.listen(editable.chat.id, timeout=current_timeout)
-        raw_text3 = input3.text
-        await input3.delete(True)
-    except asyncio.TimeoutError:
-        raw_text3 = '/d' 
-        
-    if raw_text3 == '/d':
+        b_name = file_name.replace('_', ' ')
+
+    # Parse 3️⃣ Credit & Prename
+    if len(config_lines) >= 3 and config_lines[2] != "0":
+        raw_credit = config_lines[2]
+        if "," in raw_credit:
+            CR, PRENAME = raw_credit.split(",", 1)
+            CR = CR.strip()
+            PRENAME = PRENAME.strip()
+        else:
+            CR = raw_credit
+            PRENAME = ""
+    else:
         CR = f"{CREDIT}"
         PRENAME = ""
-    elif "," in raw_text3:
-        CR, PRENAME = raw_text3.split(",", 1)
-        CR = CR.strip()
-        PRENAME = PRENAME.strip()
-    else:
-        CR = raw_text3
-        PRENAME = ""
 
-    current_timeout = 3 if auto_flags.get(chat_id) else 20
-    await editable.edit("**1. Send PW/Classplus Token For MPD urls\n2. Send /d For Others**")
-    try:
-        input4: Message = await bot.listen(editable.chat.id, timeout=current_timeout)
-        raw_text4 = input4.text
-        await input4.delete(True)
-    except asyncio.TimeoutError:
-        raw_text4 = '/d'
+    # Parse 4️⃣ Bracket Count
+    bracket_depth = 2
+    if len(config_lines) >= 4 and config_lines[3] != "0":
+        try:
+            bracket_depth = int(config_lines[3])
+        except ValueError:
+            bracket_depth = 2
 
-    current_timeout = 3 if auto_flags.get(chat_id) else 20
-    await editable.edit("**1. Send An Image For Thumbnail\n2. Send /d For default Thumbnail\n3. Send /skip For Skipping**")
+    # Internal Defaults
+    raw_text2 = "480"
+    quality = "480p"
+    res = "854x480"
+    watermark = "/d"
     thumb = "/d"
-    try:
-        input6 = await bot.listen(chat_id=m.chat.id, timeout=current_timeout)
-        
-        if input6.photo:
-            if not os.path.exists("downloads"):
-                os.makedirs("downloads")
-            temp_file = f"downloads/thumb_{m.from_user.id}.jpg"
-            try:
-                await bot.download_media(message=input6.photo, file_name=temp_file)
-                thumb = temp_file
-                await editable.edit("**✅ Custom thumbnail saved successfully!**")
-                await asyncio.sleep(1)
-            except Exception as e:
-                print(f"Error downloading thumbnail: {str(e)}")
-                await editable.edit("**⚠️ Failed to save thumbnail! Using default.**")
-                thumb = "/d"
-                await asyncio.sleep(1)
-        elif input6.text:
-            if input6.text == "/d":
-                thumb = "/d"
-                await editable.edit("**📰 Using default thumbnail.**")
-                await asyncio.sleep(1)
-            elif input6.text == "/skip":
-                thumb = "no"
-                await editable.edit("**♻️ Skipping thumbnail.**")
-                await asyncio.sleep(1)
-            else:
-                await editable.edit("**⚠️ Invalid input! Using default thumbnail.**")
-                await asyncio.sleep(1)
-        await input6.delete(True)
-    except asyncio.TimeoutError:
-        await editable.edit("**⚠️ Timeout! Using default thumbnail.**")
-        await asyncio.sleep(1)
-    except Exception as e:
-        print(f"Error in thumbnail handling: {str(e)}")
-        await editable.edit("**⚠️ Error! Using default thumbnail.**")
-        await asyncio.sleep(1)
- 
+    raw_text4 = "/d"
+
+    # 2️⃣ Target Channel Selection Prompt
     await editable.edit("__**📢 Provide the Channel ID or send /d__\n\n<blockquote>🔹Send Your Channel ID where you want upload files.\n\nEx : -100XXXXXXXXX</blockquote>\n**")
     try:
-        input7: Message = await bot.listen(editable.chat.id, timeout=current_timeout)
-        raw_text7 = input7.text
+        input7: Message = await bot.listen(editable.chat.id, timeout=30)
+        raw_text7 = input7.text.strip()
         await input7.delete(True)
     except asyncio.TimeoutError:
         raw_text7 = '/d'
@@ -669,39 +593,37 @@ async def txt_handler(bot: Client, m: Message):
     await editable.delete()
 
     try:
-        if raw_text == "1":
+        if start_idx == 1:
             batch_message = await bot.send_message(chat_id=channel_id, text=f"<blockquote><b>🎯Target Batch : {b_name}</b></blockquote>")
             try:
                 await bot.pin_chat_message(channel_id, batch_message.id)
             except Exception:
                 pass
-            if "/d" not in str(raw_text7):
-                await bot.send_message(chat_id=m.chat.id, text=f"<blockquote><b><i>🎯Target Batch : {b_name}</i></b></blockquote>\n\n🔄 Your Task is under processing, please check your Set Channel📱. Once your task is complete, I will inform you 📩")
-        else:
-            if "/d" not in str(raw_text7):
-                await bot.send_message(chat_id=m.chat.id, text=f"<blockquote><b><i>🎯Target Batch : {b_name}</i></b></blockquote>\n\n🔄 Your Task is under processing, please check your Set Channel📱. Once your task is complete, I will inform you 📩")
+        if "/d" not in str(raw_text7):
+            await bot.send_message(chat_id=m.chat.id, text=f"<blockquote><b><i>🎯Target Batch : {b_name}</i></b></blockquote>\n\n🔄 Your Task is under processing, please check your Set Channel📱. Once your task is complete, I will inform you 📩")
     except Exception as e:
         await m.reply_text(f"**Fail Reason »**\n<blockquote><i>{e}</i></blockquote>\n\n✦𝐁𝐨𝐭 𝐌𝐚𝐝𝐞 𝐁𝐲 ✦ {CREDIT}🌟`")
 
     failed_count = 0
-    count = int(raw_text)    
-    arg = int(raw_text)
     
     try:
-        for i in range(arg-1, len(links)):
+        for i in range(start_idx - 1, end_idx):
+            count = i + 1
+            raw_title = links[i][0]
             Vxy = links[i][1].replace("file/d/","uc?export=download&id=").replace("www.youtube-nocookie.com/embed", "youtu.be").replace("?modestbranding=1", "").replace("/view?usp=sharing","")
             url = "https://" + Vxy
             link0 = "https://" + Vxy
 
-            name1 = links[i][0].replace("(", "[").replace(")", "]").replace("_", "").replace("\t", "").replace(":", "").replace("/", "").replace("+", "").replace("#", "").replace("|", "").replace("@", "").replace("*", "").replace(".", "").replace("https", "").replace("http", "").strip()
+            # Extract topic & clean title via bracket depth
+            topic, name1 = parse_topic_and_title(raw_title, bracket_count=bracket_depth)
+            name1 = name1[:60]
             
             if PRENAME:
-                name = f'{PRENAME} {name1[:60]}'
+                name = f'{PRENAME} {name1}'
             else:
-                name = f'{name1[:60]}'
+                name = f'{name1}'
                  
             user_id = m.from_user.id
-            topic = "General Topic"
             
             if "visionias" in url:
                 async with ClientSession() as session:
@@ -853,61 +775,60 @@ async def txt_handler(bot: Client, m: Message):
             else:
                 cmd = f'yt-dlp -f "{ytf}" "{url}" -o "{name}.mp4"'
 
+            # Formatted Captions
+            cc = (
+                f"**Index:** {str(count).zfill(3)}\n\n"
+                f"**Title:** {name1}.mp4\n\n"
+                f"**Topic:** {topic}\n\n"
+                f"**Batch:** {b_name}\n\n"
+                f"**Extracted By:** {CR}"
+            )
+
+            cc1 = (
+                f"**Index:** {str(count).zfill(3)}\n\n"
+                f"**Title:** {name1}.pdf\n\n"
+                f"**Topic:** {topic}\n\n"
+                f"**Batch:** {b_name}\n\n"
+                f"**Extracted By:** {CR}"
+            )
+
+            cchtml = (
+                f"**Index:** {str(count).zfill(3)}\n\n"
+                f"**Title:** {name1}.html\n\n"
+                f"**Topic:** {topic}\n\n"
+                f"**Batch:** {b_name}\n\n"
+                f"**Extracted By:** {CR}"
+            )
+
+            ccimg = (
+                f"**Index:** {str(count).zfill(3)}\n\n"
+                f"**Title:** {name1}\n\n"
+                f"**Topic:** {topic}\n\n"
+                f"**Batch:** {b_name}\n\n"
+                f"**Extracted By:** {CR}"
+            )
+
+            ccm = (
+                f"**Index:** {str(count).zfill(3)}\n\n"
+                f"**Title:** {name1}\n\n"
+                f"**Topic:** {topic}\n\n"
+                f"**Batch:** {b_name}\n\n"
+                f"**Extracted By:** {CR}"
+            )
+
+            cczip = (
+                f"**Index:** {str(count).zfill(3)}\n\n"
+                f"**Title:** {name1}.zip\n\n"
+                f"**Topic:** {topic}\n\n"
+                f"**Batch:** {b_name}\n\n"
+                f"**Extracted By:** {CR}"
+            )
+
             try:
-                caption = (
-                    f"𝗜𝗻𝗱𝗲𝘅: {str(count).zfill(3)}\n\n"
-                    f"𝗧𝗶𝘁𝗹𝗲: {name1}.mp4\n\n"
-                    f"𝗧𝗼𝗽𝗶𝗰: {topic}\n\n"
-                    f"𝗕𝗮𝘁𝗰𝗵: {b_name}\n\n"
-                    f"𝗘𝘅𝘁𝗿𝗮𝗰𝘁𝗲𝗱 𝗕𝘆: {CR}"
-                )
-                cc = caption
-
-                cc1 = (
-                    f"𝗜𝗻𝗱𝗲𝘅: {str(count).zfill(3)}\n\n"
-                    f"𝗧𝗶𝘁𝗹𝗲: {name1}.mp4\n\n"
-                    f"𝗧𝗼𝗽𝗶𝗰: {topic}\n\n"
-                    f"𝗕𝗮𝘁𝗰𝗵: {b_name}\n\n"
-                    f"𝗘𝘅𝘁𝗿𝗮𝗰𝘁𝗲𝗱 𝗕𝘆: {CR}"
-                )
-
-                cchtml = (
-                    f"𝗜𝗻𝗱𝗲𝘅: {str(count).zfill(3)}\n\n"
-                    f"𝗧𝗶𝘁𝗹𝗲: {name1}.mp4\n\n"
-                    f"𝗧𝗼𝗽𝗶𝗰: {topic}\n\n"
-                    f"𝗕𝗮𝘁𝗰𝗵: {b_name}\n\n"
-                    f"𝗘𝘅𝘁𝗿𝗮𝗰𝘁𝗲𝗱 𝗕𝘆: {CR}"
-                )
-
-                ccimg = (
-                    f"𝗜𝗻𝗱𝗲𝘅: {str(count).zfill(3)}\n\n"
-                    f"𝗧𝗶𝘁𝗹𝗲: {name1}.mp4\n\n"
-                    f"𝗧𝗼𝗽𝗶𝗰: {topic}\n\n"
-                    f"𝗕𝗮𝘁𝗰𝗵: {b_name}\n\n"
-                    f"𝗘𝘅𝘁𝗿𝗮𝗰𝘁𝗲𝗱 𝗕𝘆: {CR}"
-                )
-
-                ccm = (
-                    f"𝗜𝗻𝗱𝗲𝘅: {str(count).zfill(3)}\n\n"
-                    f"𝗧𝗶𝘁𝗹𝗲: {name1}.mp4\n\n"
-                    f"𝗧𝗼𝗽𝗶𝗰: {topic}\n\n"
-                    f"𝗕𝗮𝘁𝗰𝗵: {b_name}\n\n"
-                    f"𝗘𝘅𝘁𝗿𝗮𝗰𝘁𝗲𝗱 𝗕𝘆: {CR}"
-                )
-
-                cczip = (
-                    f"𝗜𝗻𝗱𝗲𝘅: {str(count).zfill(3)}\n\n"
-                    f"𝗧𝗶𝘁𝗹𝗲: {name1}.mp4\n\n"
-                    f"𝗧𝗼𝗽𝗶𝗰: {topic}\n\n"
-                    f"𝗕𝗮𝘁𝗰𝗵: {b_name}\n\n"
-                    f"𝗘𝘅𝘁𝗿𝗮𝗰𝘁𝗲𝗱 𝗕𝘆: {CR}"
-                )
-                  
                 if "drive" in url:
                     try:
                         ka = await helper.download(url, name)
                         await bot.send_document(chat_id=channel_id, document=ka, caption=cc1)
-                        count += 1
                         if os.path.exists(ka):
                             os.remove(ka)
                     except FloodWait as e:
@@ -934,7 +855,6 @@ async def txt_handler(bot: Client, m: Message):
                                         file.write(response.content)
                                     await asyncio.sleep(retry_delay)
                                     await bot.send_document(chat_id=channel_id, document=f'{name}.pdf', caption=cc1)
-                                    count += 1
                                     if os.path.exists(f'{name}.pdf'):
                                         os.remove(f'{name}.pdf')
                                     success = True
@@ -959,7 +879,6 @@ async def txt_handler(bot: Client, m: Message):
                             proc = await asyncio.create_subprocess_shell(download_cmd)
                             await proc.communicate()
                             await bot.send_document(chat_id=channel_id, document=f'{name}.pdf', caption=cc1)
-                            count += 1
                             if os.path.exists(f'{name}.pdf'):
                                 os.remove(f'{name}.pdf')
                         except FloodWait as e:
@@ -974,7 +893,6 @@ async def txt_handler(bot: Client, m: Message):
                         await bot.send_document(chat_id=channel_id, document=f"{name}.html", caption=cchtml)
                         if os.path.exists(f'{name}.html'):
                             os.remove(f'{name}.html')
-                        count += 1
                     except FloodWait as e:
                         await m.reply_text(str(e))
                         await asyncio.sleep(e.value)
@@ -988,7 +906,6 @@ async def txt_handler(bot: Client, m: Message):
                         proc = await asyncio.create_subprocess_shell(download_cmd)
                         await proc.communicate()
                         await bot.send_photo(chat_id=channel_id, photo=f'{name}.{img_ext}', caption=ccimg)
-                        count += 1
                         if os.path.exists(f'{name}.{img_ext}'):
                             os.remove(f'{name}.{img_ext}')
                     except FloodWait as e:
@@ -1006,7 +923,6 @@ async def txt_handler(bot: Client, m: Message):
                         await bot.send_document(chat_id=channel_id, document=f'{name}.{audio_ext}', caption=ccm)
                         if os.path.exists(f'{name}.{audio_ext}'):
                             os.remove(f'{name}.{audio_ext}')
-                        count += 1
                     except FloodWait as e:
                         await m.reply_text(str(e))
                         await asyncio.sleep(e.value)
@@ -1021,15 +937,12 @@ async def txt_handler(bot: Client, m: Message):
                         await prog.delete(True) 
                         if os.path.exists(filename):
                             await helper.send_vid(bot, m, cc, filename, thumb, name, prog, channel_id, watermark=watermark)
-                            count += 1
                         else:
                             await bot.send_message(channel_id, f'⚠️**Downloading Failed**⚠️\n**Name** =>> `{str(count).zfill(3)} {name1}`\n**Url** =>> {link0}\n\n<blockquote><i><b>Failed Reason: Decrypted file not found</b></i></blockquote>', disable_web_page_preview=True)
                             failed_count += 1
-                            count += 1
                             continue
                     except Exception as e:
                         await bot.send_message(channel_id, f'⚠️**Downloading Failed**⚠️\n**Name** =>> `{str(count).zfill(3)} {name1}`\n**Url** =>> {link0}\n\n<blockquote><i><b>Failed Reason: {str(e)}</b></i></blockquote>', disable_web_page_preview=True)
-                        count += 1
                         failed_count += 1
                         continue
 
@@ -1040,7 +953,6 @@ async def txt_handler(bot: Client, m: Message):
                     filename = res_file
                     await prog.delete(True)
                     await helper.send_vid(bot, m, cc, filename, thumb, name, prog, channel_id, watermark=watermark)
-                    count += 1
                     await asyncio.sleep(1)
                     continue
 
@@ -1051,12 +963,10 @@ async def txt_handler(bot: Client, m: Message):
                     filename = res_file
                     await prog.delete(True)
                     await helper.send_vid(bot, m, cc, filename, thumb, name, prog, channel_id, watermark=watermark)
-                    count += 1
                     await asyncio.sleep(1)
                 
             except Exception as e:
                 await bot.send_message(channel_id, f'⚠️**Downloading Failed**⚠️\n**Name** =>> `{str(count).zfill(3)} {name1}`\n**Url** =>> {link0}\n\n<blockquote><i><b>Failed Reason: {str(e)}</b></i></blockquote>', disable_web_page_preview=True)
-                count += 1
                 failed_count += 1
                 continue
 
@@ -1064,8 +974,10 @@ async def txt_handler(bot: Client, m: Message):
         await m.reply_text(str(e))
         await asyncio.sleep(2)
 
-    success_count = len(links) - failed_count
+    processed_range_count = end_idx - (start_idx - 1)
+    success_count = processed_range_count - failed_count
     video_count = v2_count + mpd_count + m3u8_count + yt_count + drm_count + zip_count + other_count
+    
     if str(raw_text7) == "/d":
         await bot.send_message(
             channel_id,
@@ -1074,7 +986,7 @@ async def txt_handler(bot: Client, m: Message):
                 "<blockquote><b>📚 ʙᴀᴛᴄʜ ɴᴀᴍᴇ :</b> "
                 f"{b_name}</blockquote>\n"
                 "╭────────────────\n"
-                f"├ 🖇️ ᴛᴏᴛᴀʟ ᴜʀʟꜱ : <code>{len(links)}</code>\n"
+                f"├ 🖇️ ᴛᴏᴛᴀʟ ᴜʀʟꜱ : <code>{processed_range_count}</code>\n"
                 f"├ ✅ ꜱᴜᴄᴄᴇꜱꜱꜰᴜʟ : <code>{success_count}</code>\n"
                 f"├ ❌ ꜰᴀɪʟᴇᴅ : <code>{failed_count}</code>\n"
                 "╰────────────────\n\n"
@@ -1087,9 +999,11 @@ async def txt_handler(bot: Client, m: Message):
             )
         )
     else:
-        await bot.send_message(channel_id, f"<b>-┈━═.•°✅ Completed ✅°•.═━┈-</b>\n<blockquote><b>🎯Batch Name : {b_name}</b></blockquote>\n<blockquote>🔗 Total URLs: {len(links)} \n┃   ┠🔴 Total Failed URLs: {failed_count}\n┃   ┠🟢 Total Successful URLs: {success_count}\n┃   ┃   ┠🎥 Total Video URLs: {video_count}\n┃   ┃   ┠📄 Total PDF URLs: {pdf_count}\n┃   ┃   ┠📸 Total IMAGE URLs: {img_count}</blockquote>\n")
+        await bot.send_message(channel_id, f"<b>-┈━═.•°✅ Completed ✅°•.═━┈-</b>\n<blockquote><b>🎯Batch Name : {b_name}</b></blockquote>\n<blockquote>🔗 Total URLs: {processed_range_count} \n┃   ┠🔴 Total Failed URLs: {failed_count}\n┃   ┠🟢 Total Successful URLs: {success_count}\n┃   ┃   ┠🎥 Total Video URLs: {video_count}\n┃   ┃   ┠📄 Total PDF URLs: {pdf_count}\n┃   ┃   ┠📸 Total IMAGE URLs: {img_count}</blockquote>\n")
         await bot.send_message(m.chat.id, "<blockquote><b>✅ Your Task is completed, please check your Set Channel📱</b></blockquote>")
 
+
+# Single Direct URL Handler
 @bot.on_message(filters.text & filters.private)
 async def text_handler(bot: Client, m: Message):
     if m.from_user.is_bot:
@@ -1110,31 +1024,14 @@ async def text_handler(bot: Client, m: Message):
     raw_text2 = input2.text
     quality = f"{raw_text2}p"
     await input2.delete(True)
-    try:
-        if raw_text2 == "144":
-            res = "256x144"
-        elif raw_text2 == "240":
-            res = "426x240"
-        elif raw_text2 == "360":
-            res = "640x360"
-        elif raw_text2 == "480":
-            res = "854x480"
-        elif raw_text2 == "720":
-            res = "1280x720"
-        elif raw_text2 == "1080":
-            res = "1920x1080" 
-        else: 
-            res = "UN"
-    except Exception:
-        res = "UN"
     
     name = f"video_{int(time.time())}"
     caption = (
-        f"Index: 001\n\n"
-        f"Title: {name}.mp4\n\n"
-        f"Topic: General Topic\n\n"
-        f"Batch: Single Link\n\n"
-        f"Extracted By: {CREDIT}"
+        f"**Index:** 001\n\n"
+        f"**Title:** {name}.mp4\n\n"
+        f"**Topic:** General Topic\n\n"
+        f"**Batch:** Single Link\n\n"
+        f"**Extracted By:** {CREDIT}"
     )
     
     try:
@@ -1148,6 +1045,7 @@ async def text_handler(bot: Client, m: Message):
         await helper.send_vid(bot, m, caption, filename, "/d", name, None, m.chat.id, watermark=watermark)
     except Exception as e:
         await m.reply_text(f"⚠️ Error: {str(e)}")
+
 
 @bot.on_callback_query(filters.regex("features"))
 async def features_callback(client, callback_query: CallbackQuery):
@@ -1170,6 +1068,7 @@ async def features_callback(client, callback_query: CallbackQuery):
             [InlineKeyboardButton("🔙 Back", callback_data="back_to_start")]
         ])
     )
+
 
 @bot.on_callback_query(filters.regex("details"))
 async def details_callback(client, callback_query: CallbackQuery):
@@ -1194,6 +1093,7 @@ async def details_callback(client, callback_query: CallbackQuery):
         ])
     )
 
+
 @bot.on_callback_query(filters.regex("back_to_start"))
 async def back_to_start_callback(client, callback_query: CallbackQuery):
     await callback_query.answer()
@@ -1204,12 +1104,8 @@ async def back_to_start_callback(client, callback_query: CallbackQuery):
         "**>  /drm - ꜱᴛᴀʀᴛ ᴜᴘʟᴏᴀᴅɪɴɢ ᴄᴘ/ᴄᴡ ᴄᴏᴜʀꜱᴇꜱ**\n"
         "**>  /plan - ᴠɪᴇᴡ ʏᴏᴜʀ ꜱᴜʙꜱᴄʀɪᴘᴛɪᴏɴ ᴅᴇᴛᴀɪʟꜱ**\n"
     )
-    
     if is_admin:
-        commands_list += (
-            "\n**👑 Admin Commands**\n"
-            "• /users - List all users\n"
-        )
+        commands_list += "\n**👑 Admin Commands**\n• /users - List all users\n"
     
     await callback_query.message.edit_media(
         media=InputMediaPhoto(
@@ -1217,9 +1113,7 @@ async def back_to_start_callback(client, callback_query: CallbackQuery):
             caption=f"**Mʏ ᴄᴏᴍᴍᴀɴᴅꜱ ғᴏʀ ʏᴏᴜ [{callback_query.from_user.first_name} ](tg://settings)**\n\n{commands_list}"
         ),
         reply_markup=InlineKeyboardMarkup([
-            [
-                InlineKeyboardButton("𝐈𝐓'𝐬𝐆𝐎𝐋𝐔.™®", url="https://t.me/ITsGOLU_OWNER_BOT")
-            ],
+            [InlineKeyboardButton("𝐈𝐓'𝐬𝐆𝐎𝐋𝐔.™®", url="https://t.me/ITsGOLU_OWNER_BOT")],
             [
                 InlineKeyboardButton("ғᴇᴀᴛᴜʀᴇꜱ 🪔", callback_data="features"),
                 InlineKeyboardButton("ᴅᴇᴛᴀɪʟꜱ 🦋", callback_data="details")

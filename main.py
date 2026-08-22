@@ -445,17 +445,11 @@ async def txt_handler(bot: Client, m: Message):
     zip_count = 0
     other_count = 0
     
-    try:    
+     try:    
         with open(x, "r", encoding='utf-8') as f:
             content = f.read()
             
-        print(f"File content: {content[:500]}...")
-            
-        content = content.split("\n")
-        content = [line.strip() for line in content if line.strip()]
-        
-        print(f"Number of lines: {len(content)}")
-        
+        content = [line.strip() for line in content.split("\n") if line.strip()]
         links = []
         for i in content:
             if "://" in i:
@@ -483,9 +477,13 @@ async def txt_handler(bot: Client, m: Message):
                     zip_count += 1
                 else:
                     other_count += 1
-                        
-        print(f"Found links: {len(links)}")
-        
+                    
+        if not links:
+            await editable.edit("❌ **No links found in the text file!**")
+            if os.path.exists(x):
+                os.remove(x)
+            return
+            
     except UnicodeDecodeError:
         await m.reply_text("<b>❌ File encoding error! Please make sure the file is saved with UTF-8 encoding.</b>")
         if os.path.exists(x):
@@ -496,8 +494,11 @@ async def txt_handler(bot: Client, m: Message):
         if os.path.exists(x):
             os.remove(x)
         return
-    
-# 1️⃣ Single Configuration Prompt
+
+    # Define total_links directly after parsing
+    total_links = len(links)
+
+    # 1️⃣ Single Configuration Prompt
     prompt_text = (
         f"🔗 **Total URLs:** `{total_links}`\n\n"
         f"📌 **Enter config (each on new line):**\n"
@@ -508,7 +509,6 @@ async def txt_handler(bot: Client, m: Message):
     )
 
     await editable.edit(prompt_text)
-
     try:
         input_cfg: Message = await bot.listen(editable.chat.id, timeout=60)
         raw_config = input_cfg.text.strip()
